@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fotosentez | Gerçekçi Simülasyon</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #166534;
+      --secondary: #14532d;
+      --light: #f0fdf4;
+      --dark: #064e3b;
+      --sun: #f59e0b;
+      --glucose: #dc2626;
+      --oxygen: #0891b2;
+      --bg: #f8fafc;
+      --text: #1e293b;
+      --water: #38bdf8;
+      --co2: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem 0;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: #475569;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .simulation-container {
+      position: relative;
+      height: 650px;
+      margin: 0 auto;
+      border-radius: 28px;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #a5f3fc 0%, #dcfce7 40%, #f3f4f6 100%);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .sky {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: linear-gradient(to bottom, #e0f2fe, #bae6fd);
+      z-index: 1;
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50px;
+      opacity: 0.8;
+      z-index: 2;
+    }
+
+    .ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 35%;
+      background: linear-gradient(to top, #525252, #a3a3a3, #d4d4d4);
+      z-index: 3;
+      clip-path: polygon(0% 30%, 100% 25%, 100% 100%, 0% 100%);
+    }
+
+    .soil {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 20%;
+      background: linear-gradient(to top, #78350f, #9a3412, #d97706);
+      z-index: 4;
+    }
+
+    .sun {
+      position: absolute;
+      top: 80px;
+      right: 120px;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, var(--sun), #d97706);
+      border-radius: 50%;
+      box-shadow: 
+        0 0 60px 20px rgba(245, 158, 11, 0.5),
+        0 0 100px 40px rgba(245, 158, 11, 0.3);
+      z-index: 10;
+      animation: sunGlow 3s infinite alternate;
+    }
+
+    @keyframes sunGlow {
+      0% { box-shadow: 0 0 60px 20px rgba(245, 158, 11, 0.5), 0 0 100px 40px rgba(245, 158, 11, 0.3); }
+      100% { box-shadow: 0 0 80px 25px rgba(245, 158, 11, 0.7), 0 0 120px 50px rgba(245, 158, 11, 0.4); }
+    }
+
+    .flower-pot {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 120px;
+      background: linear-gradient(to bottom, #78716c, #57534e);
+      border-radius: 10px 10px 20px 20px;
+      z-index: 15;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      border: 3px solid #404040;
+    }
+
+    .stem {
+      position: absolute;
+      bottom: 35%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 200px;
+      background: linear-gradient(to top, #166534, #15803d, #16a34a);
+      border-radius: 6px;
+      z-index: 16;
+    }
+
+    .leaf {
+      position: absolute;
+      width: 80px;
+      height: 60px;
+      background: linear-gradient(135deg, #16a34a, #15803d, #166534);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      z-index: 17;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+
+    .leaf-1 {
+      top: 40%;
+      left: 45%;
+      transform: rotate(-20deg);
+      animation: leafSway 6s infinite ease-in-out;
+    }
+
+    .leaf-2 {
+      top: 35%;
+      left: 55%;
+      transform: rotate(20deg);
+      animation: leafSway 7s infinite ease-in-out reverse;
+    }
+
+    .leaf-3 {
+      top: 50%;
+      left: 40%;
+      transform: rotate(-10deg);
+      animation: leafSway 8s infinite ease-in-out;
+    }
+
+    .leaf-4 {
+      top: 45%;
+      left: 60%;
+      transform: rotate(15deg);
+      animation: leafSway 6.5s infinite ease-in-out reverse;
+    }
+
+    @keyframes leafSway {
+      0%, 100% { transform: rotate(var(--rotate)) translateY(0); }
+      50% { transform: rotate(var(--rotate)) translateY(-10px); }
+    }
+
+    .flower {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      z-index: 18;
+    }
+
+    .petal {
+      position: absolute;
+      width: 40px;
+      height: 60px;
+      background: linear-gradient(135deg, #ec4899, #f472b6);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      transform-origin: bottom center;
+    }
+
+    .petal:nth-child(1) { transform: rotate(0deg); top: 0; left: 30px; }
+    .petal:nth-child(2) { transform: rotate(60deg); top: 15px; left: 55px; }
+    .petal:nth-child(3) { transform: rotate(120deg); top: 45px; left: 55px; }
+    .petal:nth-child(4) { transform: rotate(180deg); top: 60px; left: 30px; }
+    .petal:nth-child(5) { transform: rotate(240deg); top: 45px; left: 5px; }
+    .petal:nth-child(6) { transform: rotate(300deg); top: 15px; left: 5px; }
+
+    .light-beam {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      width: 30px;
+      height: 250px;
+      background: linear-gradient(to bottom, rgba(245, 158, 11, 0.3), transparent);
+      transform: translateX(-50%) rotate(-15deg);
+      z-index: 8;
+      animation: beamPulse 2s infinite;
+      clip-path: polygon(50% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%);
+    }
+
+    @keyframes beamPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    .molecule {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: white;
+      z-index: 20;
+    }
+
+    .co2 {
+      background: var(--co2);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+    }
+
+    .water {
+      background: var(--water);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    }
+
+    .oxygen {
+      background: var(--oxygen);
+      box-shadow: 0 0 10px rgba(8, 145, 178, 0.6);
+    }
+
+    .glucose {
+      background: var(--glucose);
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+      border-radius: 4px;
+    }
+
+    .info-panel {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1.75rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+      max-width: 320px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,0,0,0.1);
+      z-index: 25;
+      transition: all 0.3s ease;
+    }
+
+    .info-panel h3 {
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      gap: 1.25rem;
+      z-index: 25;
+    }
+
+    .btn {
+      background: white;
+      border: 2px solid #e2e8f0;
+      padding: 0.6rem 1.2rem;
+      border-radius: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 15px -5px rgba(0, 0, 0, 0.1);
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background: #f8fafc;
+      transform: translateY(-3px);
+      border-color: #cbd5e1;
+    }
+
+    .step-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.75rem;
+      z-index: 25;
+    }
+
+    .step-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .step-dot.active {
+      background: var(--primary);
+      transform: scale(1.3);
+      box-shadow: 0 0 10px rgba(22, 101, 52, 0.4);
+    }
+
+    .explanation {
+      margin-top: 3.5rem;
+      background: white;
+      padding: 3rem;
+      border-radius: 28px;
+      box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .explanation h2 {
+      font-size: 2.25rem;
+      margin-bottom: 2rem;
+      color: var(--dark);
+      text-align: center;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+      margin-top: 2rem;
+    }
+
+    .step-card {
+      background: var(--light);
+      padding: 2rem;
+      border-radius: 20px;
+      border-left: 4px solid var(--primary);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .step-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+      border-left: 4px solid var(--secondary);
+    }
+
+    .step-card h3 {
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .step-card p {
+      color: #475569;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+      .simulation-container {
+        height: 500px;
+      }
+      h1 {
+        font-size: 2.5rem;
+      }
+      .info-panel {
+        max-width: 280px;
+        padding: 1.25rem;
+      }
+      .controls {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .btn {
+        min-width: auto;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .simulation-container {
+        height: 400px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .explanation {
+        padding: 2rem 1.5rem;
+      }
+      .step-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Fotosentez Süreci</h1>
+      <p class="subtitle">Gerçekçi bitki modeli, moleküler yapılar ve güneş ışığı ile fotosentezin detaylı simülasyonu</p>
+    </header>
+
+    <div class="simulation-container" id="simulation">
+      <div class="sky"></div>
+      
+      <!-- Bulutlar -->
+      <div class="cloud" style="top: 80px; left: 100px; width: 120px; height: 40px;"></div>
+      <div class="cloud" style="top: 120px; left: 300px; width: 150px; height: 50px;"></div>
+      <div class="cloud" style="top: 60px; left: 600px; width: 100px; height: 35px;"></div>
+
+      <div class="sun">
+        <div style="position: absolute; top: -20px; left: -20px; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);"></div>
+      </div>
+      
+      <div class="light-beam"></div>
+      
+      <!-- Bitki -->
+      <div class="flower-pot"></div>
+      <div class="stem"></div>
+      <div class="leaf leaf-1" style="--rotate: -20deg;"></div>
+      <div class="leaf leaf-2" style="--rotate: 20deg;"></div>
+      <div class="leaf leaf-3" style="--rotate: -10deg;"></div>
+      <div class="leaf leaf-4" style="--rotate: 15deg;"></div>
+      
+      <div class="flower">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+      </div>
+      
+      <div class="ground"></div>
+      <div class="soil"></div>
+
+      <div class="info-panel" id="infoPanel">
+        <h3>Güneş Işığı Emilimi</h3>
+        <p>Güneş ışığı, yapraklardaki kloroplastlarda bulunan klorofil pigmenti tarafından emilir.</p>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="speedControl">Hız: Normal</button>
+        <button class="btn" id="resetBtn">Sıfırla</button>
+      </div>
+
+      <div class="step-indicator" id="stepIndicator">
+        <div class="step-dot active" data-step="1"></div>
+        <div class="step-dot" data-step="2"></div>
+        <div class="step-dot" data-step="3"></div>
+        <div class="step-dot" data-step="4"></div>
+        <div class="step-dot" data-step="5"></div>
+        <div class="step-dot" data-step="6"></div>
+      </div>
+    </div>
+
+    <div class="explanation">
+      <h2>Fotosentez: Doğanın Mükemmel Dengesi</h2>
+      <div class="steps">
+        <div class="step-card" data-step="1">
+          <h3>☀️ Güneş Işığı</h3>
+          <p>Güneşten gelen fotonlar, yapraklardaki klorofil moleküllerini uyararak fotosentez reaksiyonlarını başlatır.</p>
+        </div>
+        <div class="step-card" data-step="2">
+          <h3>💧 Su Alımı</h3>
+          <p>Kökler topraktan suyu emer ve ksilem dokusu aracılığıyla yapraklara taşır. Su molekülleri ışıkla parçalanır.</p>
+        </div>
+        <div class="step-card" data-step="3">
+          <h3>🌬️ CO₂ Alımı</h3>
+          <p>Stomalar aracılığıyla atmosferden karbondioksit alınır. CO₂ molekülleri Calvin döngüsüne girer.</p>
+        </div>
+        <div class="step-card" data-step="4">
+          <h3>⚡ Işık Reaksiyonları</h3>
+          <p>Su moleküllerinin fotolizi sonucu ATP ve NADPH üretilir. Bu enerji molekülleri karanlık reaksiyonlarda kullanılır.</p>
+        </div>
+        <div class="step-card" data-step="5">
+          <h3>🍬 Glikoz Sentezi</h3>
+          <p>Calvin döngüsünde CO₂, ATP ve NADPH kullanılarak glikoz (C₆H₁₂O₆) moleküllerine dönüştürülür.</p>
+        </div>
+        <div class="step-card" data-step="6">
+          <h3>💨 Oksijen Salınımı</h3>
+          <p>Su moleküllerinin parçalanması sonucu ortaya çıkan oksijen (O₂), stomalardan atmosfere salınır.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const simulation = document.getElementById('simulation');
+      const infoPanel = document.getElementById('infoPanel');
+      const stepIndicator = document.getElementById('stepIndicator');
+      const speedControl = document.getElementById('speedControl');
+      const resetBtn = document.getElementById('resetBtn');
+      const stepCards = document.querySelectorAll('.step-card');
+      
+      let currentStep = 1;
+      let animationSpeed = 1;
+      let molecules = [];
+      let animationId;
+      
+      const steps = {
+        1: {
+          title: "Güneş Işığı Emilimi",
+          text: "Güneşten gelen ışık enerjisi, yapraklardaki kloroplastlarda bulunan klorofil pigmenti tarafından emilir.",
+          color: "#f59e0b",
+          emoji: "☀️"
+        },
+        2: {
+          title: "Su Alımı (H₂O)",
+          text: "Kökler topraktan suyu emer ve ksilem dokusu aracılığıyla yapraklara taşır. Su molekülleri ışık enerjisiyle parçalanır.",
+          color: "#38bdf8",
+          emoji: "💧"
+        },
+        3: {
+          title: "CO₂ Alımı",
+          text: "Stomalar aracılığıyla atmosferden karbondioksit alınır. CO₂ molekülleri Calvin döngüsü için hazır hale getirilir.",
+          color: "#ef4444",
+          emoji: "🌬️"
+        },
+        4: {
+          title: "Işık Reaksiyonları",
+          text: "Su moleküllerinin fotolizi sonucu ATP ve NADPH üretilir. Bu enerji molekülleri karanlık reaksiyonlarda kullanılır.",
+          color: "#8b5cf6",
+          emoji: "⚡"
+        },
+        5: {
+          title: "Glikoz Sentezi (C₆H₁₂O₆)",
+          text: "Calvin döngüsünde CO₂, ATP ve NADPH kullanılarak glikoz moleküllerine dönüştürülür. Bu glikoz bitki için enerji kaynağıdır.",
+          color: "#dc2626",
+          emoji: "🍬"
+        },
+        6: {
+          title: "Oksijen Salınımı (O₂)",
+          text: "Su moleküllerinin parçalanması sonucu ortaya çıkan oksijen, stomalardan atmosfere salınır. Bu oksijen tüm canlılar için hayati öneme sahiptir.",
+          color: "#0891b2",
+          emoji: "💨"
+        }
+      };
+      
+      // Initialize step indicators
+      function updateStepIndicators() {
+        document.querySelectorAll('.step-dot').forEach((dot, index) => {
+          if (index + 1 === currentStep) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+      
+      // Update info panel
+      function updateInfoPanel() {
+        infoPanel.innerHTML = `
+          <h3>${steps[currentStep].title}</h3>
+          <p>${steps[currentStep].text}</p>
+        `;
+        infoPanel.style.borderLeft = `4px solid ${steps[currentStep].color}`;
+      }
+      
+      // Create molecule
+      function createMolecule(type, x, y) {
+        const molecule = document.createElement('div');
+        molecule.className = `molecule ${type}`;
+        molecule.textContent = type === 'co2' ? 'CO₂' : 
+                              type === 'water' ? 'H₂O' : 
+                              type === 'oxygen' ? 'O₂' : 
+                              type === 'glucose' ? 'C₆H₁₂O₆' : '';
+        
+        molecule.style.left = `${x}px`;
+        molecule.style.top = `${y}px`;
+        
+        simulation.appendChild(molecule);
+        
+        const moleculeObj = {
+          element: molecule,
+          x: x,
+          y: y,
+          type: type,
+          vx: 0,
+          vy: 0,
+          life: 150
+        };
+        
+        // Set initial velocity based on type
+        if (type === 'co2') {
+          moleculeObj.vx = (Math.random() - 0.5) * 2;
+          moleculeObj.vy = (Math.random() - 0.3) * 1.5;
+        } else if (type === 'water') {
+          moleculeObj.vx = (Math.random() - 0.5) * 1.5;
+          moleculeObj.vy = -Math.random() * 2 - 0.5;
+        } else if (type === 'oxygen') {
+          moleculeObj.vx = (Math.random() - 0.5) * 2.5;
+          moleculeObj.vy = -Math.random() * 3 - 1;
+        } else if (type === 'glucose') {
+          moleculeObj.vx = (Math.random() - 0.5) * 1.8;
+          moleculeObj.vy = Math.random() * 1.5 - 2.5;
+        }
+        
+        molecules.push(moleculeObj);
+        return moleculeObj;
+      }
+      
+      // Get random position around leaf
+      function getRandomLeafPosition() {
+        const leafRect = document.querySelector('.leaf-1').getBoundingClientRect();
+        const simRect = simulation.getBoundingClientRect();
+        const centerX = leafRect.left + leafRect.width/2 - simRect.left;
+        const centerY = leafRect.top + leafRect.height/2 - simRect.top;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 30 + Math.random() * 50;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        
+        return { x, y };
+      }
+      
+      // Animation loop
+      function animate() {
+        // Update molecules
+        molecules.forEach((molecule, index) => {
+          if (molecule.type === 'co2' && currentStep === 3) {
+            molecule.x += molecule.vx * 0.3 * animationSpeed;
+            molecule.y += molecule.vy * 0.3 * animationSpeed;
+          } else if (molecule.type === 'water' && currentStep === 2) {
+            molecule.x += molecule.vx * 0.4 * animationSpeed;
+            molecule.y += molecule.vy * 0.4 * animationSpeed;
+          } else if (molecule.type === 'oxygen' && currentStep === 6) {
+            molecule.x += molecule.vx * animationSpeed;
+            molecule.y += molecule.vy * animationSpeed;
+          } else if (molecule.type === 'glucose' && currentStep === 5) {
+            molecule.x += molecule.vx * 0.8 * animationSpeed;
+            molecule.y += molecule.vy * 0.8 * animationSpeed;
+          }
+          
+          molecule.life -= 0.8 * animationSpeed;
+          
+          molecule.element.style.left = `${molecule.x}px`;
+          molecule.element.style.top = `${molecule.y}px`;
+          molecule.element.style.opacity = molecule.life / 150;
+          
+          if (molecule.life <= 0) {
+            molecule.element.remove();
+            molecules.splice(index, 1);
+          }
+        });
+        
+        // Cycle through steps and create molecules
+        if (Math.random() < 0.015 * animationSpeed) {
+          currentStep = currentStep % 6 + 1;
+          updateStepIndicators();
+          updateInfoPanel();
+          
+          // Create molecules based on current step
+          if (currentStep === 2) {
+            const pos = getRandomLeafPosition();
+            createMolecule('water', pos.x, pos.y + 50);
+          } else if (currentStep === 3) {
+            const pos = getRandomLeafPosition();
+            createMolecule('co2', pos.x + 80, pos.y);
+          } else if (currentStep === 5) {
+            const pos = getRandomLeafPosition();
+            createMolecule('glucose', pos.x, pos.y);
+          } else if (currentStep === 6) {
+            const pos = getRandomLeafPosition();
+            createMolecule('oxygen', pos.x, pos.y);
+          }
+        }
+        
+        animationId = requestAnimationFrame(animate);
+      }
+      
+      // Start animation
+      animate();
+      
+      // Event listeners
+      speedControl.addEventListener('click', () => {
+        if (animationSpeed === 1) {
+          animationSpeed = 2;
+          speedControl.textContent = 'Hız: Hızlı';
+        } else if (animationSpeed === 2) {
+          animationSpeed = 0.5;
+          speedControl.textContent = 'Hız: Yavaş';
+        } else {
+          animationSpeed = 1;
+          speedControl.textContent = 'Hız: Normal';
+        }
+      });
+      
+      resetBtn.addEventListener('click', () => {
+        currentStep = 1;
+        updateStepIndicators();
+        updateInfoPanel();
+        molecules.forEach(m => m.element.remove());
+        molecules = [];
+      });
+      
+      // Hover on step cards
+      stepCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          const step = parseInt(card.getAttribute('data-step'));
+          currentStep = step;
+          updateStepIndicators();
+          updateInfoPanel();
+          
+          // Create molecule for the hovered step
+          if (step === 2) {
+            const pos = getRandomLeafPosition();
+            createMolecule('water', pos.x, pos.y + 50);
+          } else if (step === 3) {
+            const pos = getRandomLeafPosition();
+            createMolecule('co2', pos.x + 80, pos.y);
+          } else if (step === 5) {
+            const pos = getRandomLeafPosition();
+            createMolecule('glucose', pos.x, pos.y);
+          } else if (step === 6) {
+            const pos = getRandomLeafPosition();
+            createMolecule('oxygen', pos.x, pos.y);
+          }
+        });
+      });
+      
+      // Parallax effect on scroll
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset;
+        const clouds = document.querySelectorAll('.cloud');
+        const sun = document.querySelector('.sun');
+        const stem = document.querySelector('.stem');
+        const leaves = document.querySelectorAll('.leaf');
+        
+        // Cloud parallax
+        clouds.forEach((cloud, index) => {
+          cloud.style.transform = `translateX(${scrollTop * 0.05 * (index + 1)}px)`;
+        });
+        
+        // Sun parallax
+        sun.style.transform = `translateY(${scrollTop * 0.03}px)`;
+        
+        // Plant sway
+        stem.style.transform = `translateX(-50%) rotate(${Math.sin(scrollTop * 0.01) * 2}deg)`;
+        leaves.forEach((leaf, index) => {
+          leaf.style.transform = `rotate(${leaf.style.getPropertyValue('--rotate').replace('deg', '')}deg) translateY(${Math.sin(scrollTop * 0.01 + index) * 5}px)`;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
